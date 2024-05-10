@@ -2,9 +2,6 @@ import json
 import os
 
 def get_class_id(annotation):
-    """
-    클래스 인덱스를 반환하는 함수.
-    """
     class_mapping = {
         '금속캔': 0,
         '종이': 1,
@@ -31,7 +28,7 @@ def get_class_id(annotation):
     return class_mapping[class_name]
 
 # JSON 파일 로드
-file_path = "Sample\Sample\labels\\1"
+file_path = "Sample\Sample\labels\\2"
 for (path, dir, files) in os.walk(file_path):
     for filename in files:
         ext = os.path.splitext(filename)[-1]
@@ -53,9 +50,11 @@ for (path, dir, files) in os.walk(file_path):
                         y_min = points[1]
                         box_width = points[2]
                         box_height = points[3]
+                        x_max = x_min + box_width
+                        y_max = y_min + box_width
     
-                        x_center = (x_min + box_width / 2) / image_width
-                        y_center = (y_min + box_height / 2) / image_height
+                        x_center = (x_min + x_max / 2) / image_width
+                        y_center = (y_min + y_max / 2) / image_height
                         width = box_width / image_width
                         height = box_height / image_height
                     elif annotation['SHAPE_TYPE'] == 'POLYGON':
@@ -73,8 +72,8 @@ for (path, dir, files) in os.walk(file_path):
                         bbox_width = max_x - min_x
                         bbox_height = max_y - min_y
 
-                        x_center = min_x + (bbox_width / 2)
-                        y_center = min_y + (bbox_height / 2)
+                        x_center = (min_x + max_x)/2
+                        y_center = (min_y +max_y) / 2
 
 
                         x_center = x_center / img_width
@@ -88,7 +87,7 @@ for (path, dir, files) in os.walk(file_path):
                     class_id = get_class_id(annotation)
                     yolo_format = f"{class_id} {x_center} {y_center} {width} {height}\n"
     
-                    with open('my_data\\' + f"{image_file_name}.txt", 'w') as yolo_file:
+                    with open('my_data\\validation\labels\\' + f"{image_file_name}.txt", 'w') as yolo_file:
                         yolo_file.write(yolo_format)
 
                     print("변환 완료!")
